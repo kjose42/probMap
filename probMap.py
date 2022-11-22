@@ -130,28 +130,33 @@ def createGrid(c, r, content):
 	while blk_lst[startx*starty - 1].blocked == True: #change coords if starting block is blocked
 		startx = random.randint(1, c)
 		starty = random.randint(1, r)
-	f.write(str(startx) + " " + str(starty) + "\n")
-	
+	f.write("(x0, y0) = (" + str(startx) + "," + str(starty) + ")\n")
+	f.write("(xi, yi):\n")
 	curx = startx
 	cury = starty
+	moveArr = []
 	for inc in range(50): #50 ground truth states
 		move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
 		moveChar = ' '
 		oldx = curx
 		oldy = cury
 		#updating coords
-		if move == 1 and cury != 1:
+		if move == 1:
 			moveChar = 'U'
-			cury = cury - 1
-		if move == 2 and curx != 1:
+			if cury != 1:
+				cury = cury - 1
+		if move == 2:
 			moveChar = 'L'
-			curx = curx - 1
-		if move == 3 and cury != 10:
+			if curx != 1:
+				curx = curx - 1
+		if move == 3:
 			moveChar = 'D'
-			cury = cury + 1
-		if move == 4 and curx != 20:
+			if cury != 10:
+				cury = cury + 1
+		if move == 4:
 			moveChar = 'R'
-			curx = curx + 1
+			if curx != 20:
+				curx = curx + 1
 		listFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 		fail = random.choice(listFail)
 		#if fail == 1:
@@ -160,9 +165,12 @@ def createGrid(c, r, content):
 			#print("blocked")
 			curx = oldx
 			cury = oldy
-		#print(move)
+		moveArr.append(moveChar)
 		#print("*" + str(curx) + " " + str(cury) + "*")
 		f.write("(" + str(curx) + "," + str(cury) + ")\n")
+	f.write("a:\n")
+	for inc in range(50):
+		f.write(moveArr[inc] + "\n")
 	f.close()
 	
 	root.resizable(True, True)
