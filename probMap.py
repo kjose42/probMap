@@ -136,16 +136,21 @@ def createGrid(c, r, content):
 	cury = starty
 	for inc in range(50): #50 ground truth states
 		move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
+		moveChar = ' '
 		oldx = curx
 		oldy = cury
 		#updating coords
 		if move == 1 and cury != 1:
+			moveChar = 'U'
 			cury = cury - 1
 		if move == 2 and curx != 1:
+			moveChar = 'L'
 			curx = curx - 1
 		if move == 3 and cury != 10:
+			moveChar = 'D'
 			cury = cury + 1
 		if move == 4 and curx != 20:
+			moveChar = 'R'
 			curx = curx + 1
 		listFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 		fail = random.choice(listFail)
