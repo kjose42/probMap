@@ -134,7 +134,7 @@ def createGrid(c, r, content):
 	
 	curx = startx
 	cury = starty
-	for inc in range(50):
+	for inc in range(50): #50 ground truth states
 		move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
 		oldx = curx
 		oldy = cury
