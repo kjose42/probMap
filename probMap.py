@@ -154,7 +154,7 @@ def createGrid(c, r, content):
 			curx = curx + 1
 		listFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 		fail = random.choice(listFail)
-		if fail == 1:
+		#if fail == 1:
 			#print("fail")
 		if gridB[curx - 1][cury - 1] == 1 or fail == 1: #checking if its trying to move to a blocked block
 			#print("blocked")
