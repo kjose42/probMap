@@ -16,8 +16,8 @@ class block:
 def createTest(n):
 
 	#randanly select a grid size
-	row = 10	
-	col = 20	
+	row = 50	
+	col = 100	
 
 	# create file
 	f = open(f'testcase{n}.txt', "x")
