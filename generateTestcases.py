@@ -2,17 +2,6 @@
 
 import random
 
-class block:
-	def __init__(self, position, blk):
-		if blk == 1:
-			self.blocked = True
-		else:
-			self.blocked = False
-
-		self.x = position[0]
-		self.y = position[1]
-		self.vertices = [(position[0], position[1]), (position[0], position[1] + 1), (position[0] + 1, position[1]), (position[0] + 1, position[1] + 1)]
-
 def createTest(n):
 
 	#randanly select a grid size
@@ -45,8 +34,6 @@ def createTest(n):
 				intB = random.choice(listB)
 			else:
 				intB = 0
-			temp_block = block([tempR, tempC], intB)
-			blk_lst.append(temp_block)
 			f.write(str(tempC) + " " + str(tempR) + " " + str(intB) + " " + str(intH) + " " + str(intT) + "\n")
 
 	# close the file
