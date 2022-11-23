@@ -41,8 +41,7 @@ def createTest(n):
 
 
 def main():
-	nTestcases = input('Enter the number of testcases to generate: ')
-	for i in range(int(nTestcases)):
+	for i in range(int(10)):
 		print(f'Generating testcase {i}')
 		createTest(i)
 
