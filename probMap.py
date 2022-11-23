@@ -21,7 +21,7 @@ class block:
 		self.x = position[0]
 		self.y = position[1]
 
-def createGrid(c, r, content):
+def createGrid(c, r, content, inNum):
 	root = Tk()
 	root.title('Grid')
 	root.geometry("800x700")
@@ -124,7 +124,7 @@ def createGrid(c, r, content):
 			temp_block = block([i+1, j+1], gridB[i][j], gridH[i][j], gridT[i][j])
 			blk_lst.append(temp_block)
 
-	f = open(f'groundTruth{0}.txt', "x")
+	f = open(f'groundTruth{inNum}.txt', "x")
 	startx = random.randint(1, c)
 	starty = random.randint(1, r)
 	while blk_lst[startx*starty - 1].blocked == True: #change coords if starting block is blocked
@@ -214,6 +214,6 @@ def main():
 	testFile = open(f'testcase{textnum}.txt', "r")
 	content = testFile.readlines()
 	col, row = content[2].split()
-	createGrid(int(col), int(row), content)
+	createGrid(int(col), int(row), content, inNum)
 
 main();
