@@ -136,7 +136,7 @@ def createGrid(c, r, content, inNum):
 	cury = starty
 	moveArr = []
 	sensorArr = []
-	for inc in range(50): #generating ground truth states
+	for inc in range(100): #generating ground truth states
 		move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
 		moveChar = ' '
 		oldx = curx
@@ -152,11 +152,11 @@ def createGrid(c, r, content, inNum):
 				curx = curx - 1
 		if move == 3:
 			moveChar = 'D'
-			if cury != 10:
+			if cury != 50:
 				cury = cury + 1
 		if move == 4:
 			moveChar = 'R'
-			if curx != 20:
+			if curx != 100:
 				curx = curx + 1
 		moveFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 		movef = random.choice(moveFail)
@@ -196,12 +196,12 @@ def createGrid(c, r, content, inNum):
 
 	#generating actions
 	f.write("a:\n")
-	for inc in range(50):
+	for inc in range(100):
 		f.write(moveArr[inc] + "\n")
 
 	#generating sensor readings
 	f.write("e:\n")
-	for inc in range(50):
+	for inc in range(100):
 		f.write(sensorArr[inc] + "\n")
 	f.close()
 	
