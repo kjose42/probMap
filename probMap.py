@@ -57,13 +57,13 @@ def createGrid(c, r, content, inNum):
 
 
 	#-------------------------------------------------------------------------------------------
-	#Drawing the Grid (sqaures, vertices, start & goal)
+	#Drawing the Grid (sqaures, vertices, start)
 	gridB = []
 	gridH = []
 	gridT = []
 
 	#i represents the current grid square, used to check square's boolean var
-	i = 3
+	i = 2
 	for x in range(0, c):
 		for y in range(0, r):
 			cx, cy, b, h, t = content[i].split()
@@ -83,7 +83,7 @@ def createGrid(c, r, content, inNum):
 			my_canvas.create_rectangle(x1,y1,y2,x2)
 		
 
-	i = 3
+	i = 2
 	for co in range(0, c):
 		tmp_arrB = []
 		tmp_arrH = []
@@ -215,7 +215,7 @@ def main():
 	textnum = input('Enter the number of the testcase that you want to run: ')
 	testFile = open(f'testcase{textnum}.txt', "r")
 	content = testFile.readlines()
-	col, row = content[2].split()
-	createGrid(int(col), int(row), content, textNum)
+	col, row = content[1].split()
+	createGrid(int(col), int(row), content, textnum)
 
 main();
