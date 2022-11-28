@@ -11,14 +11,13 @@ def createTest(n):
 	# create file
 	f = open(f'testcase{n}.txt', "x")
 
-	# generate start, goal, and size of the grid
+	# generate start and size of the grid
 	listR = [*range(1, row+1, 1)]
 	listC = [*range(1, col+1, 1)]
 	listB = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of being blocked
 	listH = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1] # 20% chance of being highway
 	listT = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1] # 20% chance of being "hard to traverse"
 
-	f.write(str(random.choice(listC)) + " " + str(random.choice(listR)) + "\n")
 	f.write(str(random.choice(listC)) + " " + str(random.choice(listR)) + "\n")
 	f.write(str(col) + " " + str(row) + "\n")
 
