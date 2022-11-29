@@ -161,14 +161,10 @@ def createGrid(c, r, content, inNum):
 					curx = curx + 1
 			moveFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 			movef = random.choice(moveFail)
-			#if movef == 1:
-				#print("fail")
 			if gridB[curx - 1][cury - 1] == 1 or movef == 1: #checking if its trying to move to a blocked block
-				#print("blocked")
 				curx = oldx
 				cury = oldy
 			moveArr.append(moveChar)
-			#print("*" + str(curx) + " " + str(cury) + "*")
 			f.write("(" + str(curx) + "," + str(cury) + ")\n")
 		
 			actualType = 'N'
@@ -179,16 +175,13 @@ def createGrid(c, r, content, inNum):
 			if gridT[curx - 1][cury - 1] == 1:
 				actualType = 'T'
 				otherTypes = ['N', 'H']
-			print(actualType)
 			senseFail1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] #5% chance of failing and sensing other type
 			senseFail2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] 
 			senseF1 = random.choice(senseFail1)
 			senseF2 = random.choice(senseFail2)
 			if senseF1 == 1:
-				print("fail1")
 				sensorArr.append(otherTypes[0])
 			elif senseF2 == 1:
-				print("fail2")
 				sensorArr.append(otherTypes[1])
 			else:
 				sensorArr.append(actualType)
