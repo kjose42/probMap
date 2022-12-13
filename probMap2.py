@@ -247,7 +247,7 @@ def createGrid(c, r, content, inNum):
 	root.resizable(True, True)
 	root.mainloop()
 
-def calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
+def filteringCalc(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 	if gridT[x][y] == 'B':
 		return 0.00
 	#{prevx, prevy} represents agent coords before moving into {x,y}
