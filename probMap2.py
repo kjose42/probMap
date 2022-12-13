@@ -223,20 +223,14 @@ def createGrid(c, r, content, inNum):
 			f.write(sensorArr[inc] + "\n")
 
 		f.close()
-	#for x in range(c):
-		#for y in range(r):
-			#x1 = (x * 50 + 20)
-			#x2 = (x1 + 10)
-			#y1 = (y * 50 + 20)
-			#y2 = (y1 + 10)
-			#text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=gridP[x][y], tags="text")
 
 	#textnum = input('Enter the number of the ground truth file that you want to run: ')
 	#print(textnum)
 	#finding probability when direction is R and blocktype is N
-	direction = 'R'
-	blockType = 'N'
-	typeProb = probN 
+	direction = 'D'
+	blockType = 'H'
+	typeProb = probH 
+	total = 0
 	for x in range(c):
 		for y in range(r):
 			x1 = (x * 50 + 20)
@@ -244,53 +238,79 @@ def createGrid(c, r, content, inNum):
 			y1 = (y * 50 + 20)
 			y2 = (y1 + 10)
 			gridCP[x][y] = calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP)#changed
-			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=gridCP[x][y], tags="text")
-	print(probN)
-	print(probH)
-	print(probT)
+			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
+			total = total + gridCP[x][y]
+	print(total)
+	#print(probN)
+	#print(probH)
+	#print(probT)
 	root.resizable(True, True)
 	root.mainloop()
 
 def calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
+	if gridT[x][y] == 'B':
+		return 0.00
+	#{prevx, prevy} represents agent coords before moving into {x,y}
+	#prevx or prevy will stay as -1 if out of bounds
+	prevx = -1
+	prevy = -1
+	if direction == 'U':
+		prevx = x
+		if y != r-1:
+			prevy = y + 1
+	if direction == 'L':
+		prevy = y
+		if x != c-1:
+			prevx = x + 1
+	if direction == 'D':
+		prevx = x
+		if y != 0:
+			prevy = y - 1
+	if direction == 'R':
+		prevy = y
+		if x != 0:
+			prevx = x - 1
+	#{nextx, nexty} represents agent coords after moving from {x,y}
+	#nextx or nexty will stay as -1 if out of bounds
+	nextx = -1
+	nexty = -1
+	if direction == 'U':
+		nextx = x
+		if y != 0:
+			nexty = y - 1
+	if direction == 'L':
+		nexty = y
+		if x != 0:
+			nextx = x - 1
+	if direction == 'D':
+		nextx = x
+		if y != r-1:
+			nexty = y + 1
+	if direction == 'R':
+		nexty = y
+		if x != c-1:
+			nextx = x + 1
+	prevProb = 0
+	calc1 = 0
+	if prevx != -1 and prevy != -1: 
+		prevProb = gridP[prevx][prevy]
+	if nextx != -1 and nexty != -1:
+		if gridT[nextx][nexty] == 'B':
+			calc1 = 1*(gridP[x][y]) + .9*(prevProb)*(1-gridP[x][y])
+		else:
+			#if movement isnt blocked, .1 chance to stay
+			calc1 = .1*(gridP[x][y]) + .9*(prevProb)*(1-gridP[x][y])
+	else:
+		calc1 = 1*(gridP[x][y]) + .9*(prevProb)*(1-gridP[x][y])
 	#T represents block type, C represents {x,y})
 	#given the agent is at {x,y}, calc1 is the probability of correct reading
-	#= P(E = T|X = C)'
-	#{prevx, prevy} represents X0 when X0 is not {x,y}, but X1 is {x,y}
-	prevx = 0
-	prevy = 0
-	if direction == 'U':
-		if y != 1:
-			prevy = prevy - 1
-	if direction == 'L':
-		if x != 1:
-			prevx = prevx - 1
-	if direction == 'D':
-		if y != r:
-			prevy = prevy + 1
-	if direction == 'R':
-		if x != c:
-			prevx = prevx + 1
-	prevProb = gridP[prevx][prevy]
-	calc1 = .1*(gridP[x][y]) + .9*(gridP[prevx][prevy])*(1-gridP[x][y]) 
-	
+	#= P(E = T|X = C)
 	#given agent is at {x,y}, chance of reading is correct = P(E = T|X = C)
 	if gridT[x][y] == blockType:
-		calc1 = round(calc1 * .9, 2)
-	elif gridT[x][y] == 'B':
-		calc1 = round(calc1 * 0.0, 2)
+		calc1 = calc1 * .9
 	else:
-		calc1 = round(calc1 * .05, 2)
+		calc1 = calc1 * .05
 	#given agent is at {x,y}, chance of reading is correct = P(E = T|X = C)
-
-	#given that the reading is right, calc2 is probability of agent not being at {x,y}
-	#= P(X != C|E = T)
-	calc2 = 0
-	if gridT[x][y] != 'B': #0 chance if blocked
-		calc2 = typeProb
-	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X = C)
-	if gridT[x][y] == blockType:
-		calc2 = calc2 - gridP[x][y]
-	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X = C)
 
 	#given agent was prev not at {x,y}, chance of agent currently not at {x,y} = P(X1 != D|X0 != D)
 	moveProb = 0 #calculating prob of agent moving and P(X1 != C|X0 != C) = True
@@ -299,9 +319,28 @@ def calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 	stayProb = .1*(1 - gridP[x][y])
 	#given agent was prev not at {x,y}, chance of agent currently not at {x,y} = P(X1 != D|X0 != D)
 		
-	calc2 = calc2*(.9*gridP[x][y] + (moveProb + stayProb)*(1-gridP[x][y]))
+	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X != C)
+	#typeProb = chance of agent in right block type
+	
+	if gridT[x][y] == blockType:
+		calc2 = .9*(typeProb-gridP[x][y]) + .1*(1-typeProb)
+	else:
+		calc2 = .9*typeProb + .1*(1-typeProb-gridP[x][y])
+	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X != C)
 
-	return round(calc2,2)
+	#nextProb represents (X1 != C|X0 = C)
+	#(X1 != C|X0 = C) means that agent moves from {x,y}
+	nextProb = 0
+	if nextx != -1 and nexty != -1: #case of out of bounds next position
+		if gridT[nextx][nexty] == 'B':
+			nextProb = 0
+		else:
+			nextProb = 1
+	calc2 = calc2*(.9*nextProb*gridP[x][y] + (moveProb + stayProb)*(1-gridP[x][y]))
+	#isolating 'a' variable
+	a = 1/(calc1 + calc2)
+	ans = a*calc1
+	return ans
 
 def main():
 	textnum = input('Enter the number of the testcase that you want to run: ')
@@ -309,5 +348,4 @@ def main():
 	content = testFile.readlines()
 	col, row = content[1].split()
 	createGrid(int(col), int(row), content, textnum)
-	#createProb(int(col), int(row), context, textnum)
 main();
