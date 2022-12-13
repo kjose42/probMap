@@ -227,9 +227,9 @@ def createGrid(c, r, content, inNum):
 	#textnum = input('Enter the number of the ground truth file that you want to run: ')
 	#print(textnum)
 	#finding probability when direction is R and blocktype is N
-	direction = 'D'
-	blockType = 'H'
-	typeProb = probH 
+	direction = 'R'
+	blockType = 'N'
+	typeProb = probN 
 	total = 0
 	for x in range(c):
 		for y in range(r):
