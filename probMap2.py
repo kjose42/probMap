@@ -238,12 +238,45 @@ def createGrid(c, r, content, inNum):
 			y1 = (y * 50 + 20)
 			y2 = (y1 + 10)
 			gridCP[x][y] = calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP)#changed
-			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
+			#text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
 			total = total + gridCP[x][y]
-	print(total)
-	#print(probN)
-	#print(probH)
-	#print(probT)
+	gridP = gridCP
+	probArr = resetTypeProb(c, r, gridT, gridP)
+	probN = probArr[0]
+	probH = probArr[1]
+	probT = probArr[2]
+	print(probN)
+	print(probH)
+	print(probT)
+	direction = 'D'
+	blockType = 'H'
+	typeProb = probH
+	total = 0
+	for x in range(c):
+		for y in range(r):
+			x1 = (x * 50 + 20)
+			x2 = (x1 + 10)
+			y1 = (y * 50 + 20)
+			y2 = (y1 + 10)
+			gridCP[x][y] = calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP)#changed
+			total = total + gridCP[x][y]
+			#text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
+	for x in range(c):
+		for y in range(r):
+			x1 = (x * 50 + 20)
+			x2 = (x1 + 10)
+			y1 = (y * 50 + 20)
+			y2 = (y1 + 10)
+			gridCP[x][y] = gridCP[x][y]/total
+			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
+	gridP = gridCP
+	probArr = resetTypeProb(c, r, gridT, gridP)
+	probN = probArr[0]
+	probH = probArr[1]
+	probT = probArr[2]
+	print(probN)
+	print(probH)
+	print(probT)
 	root.resizable(True, True)
 	root.mainloop()
 
