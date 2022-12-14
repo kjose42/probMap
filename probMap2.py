@@ -89,7 +89,15 @@ def createGrid(c, r, content, contentTruth):
 		gridT.append(tmp_arrT)
 		gridP.append(tmp_arrP)
 	skip = 0
-	for i in range(100): 
+	for i in range(100):
+		trux, truy = contentTruth[2+i].split()
+		trux = int(trux)
+		truy = int(truy)
+		x1 = (trux * 50)
+		y1 = (truy * 50)
+		x2 = x1 + 20
+		y2 = y1 + 20
+		my_canvas.create_oval(x1, y1, x2, y2, fill='blue')
 		direction = contentTruth[3+100+i].rstrip()
 		#print(direction)
 		blockType = contentTruth[4+100+100+i].rstrip()
