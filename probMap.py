@@ -141,7 +141,7 @@ def createGrid(c, r, content, contentTruth):
 				text = my_canvas.create_text(x1 + 25, y1 + 15, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
 		if i != 99:
 			if skip == 0:
-				inNum = input('You are on step ' + str(i) + '. Enter the number of steps you want to proceed with: ')
+				inNum = input('You are on step ' + str(i+1) + '. Enter the number of steps you want to proceed with: ')
 				skip = int(inNum) - 1
 			else:#still need to skip more steps
 				skip = skip - 1
