@@ -3,44 +3,9 @@ from tkinter import ttk
 from math import sqrt
 from array import *
 import random
+import matplotlib.pyplot as plt
 
 def createGrid(c, r, content, contentTruth):
-	root = Tk()
-	root.title('Grid')
-	root.geometry("800x700")
-
-	# Create A Main frame
-	main_frame = Frame(root)
-	main_frame.pack(fill=BOTH,expand=1)
-
-	# Create Frame for X Scrollbar
-	sec = Frame(main_frame)
-	sec.pack(fill=X,side=BOTTOM)
-
-	# Create A Canvas
-	my_canvas = Canvas(main_frame)
-	my_canvas.pack(side=LEFT,fill=BOTH,expand=1)
-
-	# Add A Scrollbars to Canvas
-	x_scrollbar = ttk.Scrollbar(sec,orient=HORIZONTAL,command=my_canvas.xview)
-	x_scrollbar.pack(side=BOTTOM,fill=X)
-	y_scrollbar = ttk.Scrollbar(main_frame,orient=VERTICAL,command=my_canvas.yview)
-	y_scrollbar.pack(side=RIGHT,fill=Y)
-
-	# Configure the canvas
-	my_canvas.configure(xscrollcommand=x_scrollbar.set)
-	my_canvas.configure(yscrollcommand=y_scrollbar.set)
-	my_canvas.bind("<Configure>",lambda e: my_canvas.config(scrollregion= my_canvas.bbox(ALL))) 
-
-	# Create Another Frame INSIDE the Canvas
-	second_frame = Frame(my_canvas)
-
-	# Add that New Frame a Window In The Canvas
-	my_canvas.create_window((0,0),window= second_frame, anchor="nw")
-
-
-	#-------------------------------------------------------------------------------------------
-	#Drawing the Grid (sqaures, vertices, start)
 	errorArr = [] #stores error values
 	truthArr = [] #stores agent's true position probability
 	gridT = [] #grid indicating square type
@@ -53,8 +18,6 @@ def createGrid(c, r, content, contentTruth):
 	probT = 0 #probability of agent in "hard to traverse"
 	blockedCount = 0 #total num of blocked blocks
 	prevDir = ' ' #direction of previous step
-
-	draw(c, r, content, contentTruth, gridT, my_canvas)
 	
 	#counting blocked squares
 	i = 2
@@ -98,11 +61,6 @@ def createGrid(c, r, content, contentTruth):
 		trux, truy = contentTruth[2+i].split()
 		trux = int(trux)
 		truy = int(truy)
-		x1 = (trux * 50)
-		y1 = (truy * 50)
-		x2 = x1 + 20
-		y2 = y1 + 20
-		my_canvas.create_oval(x1, y1, x2, y2, fill='blue')
 		direction = contentTruth[3+100+i].rstrip()
 		#print(direction)
 		blockType = contentTruth[4+100+100+i].rstrip()
@@ -129,7 +87,6 @@ def createGrid(c, r, content, contentTruth):
 					gridF1[x][y] = ansArr[0]
 					gridF2[x][y] = ansArr[1]
 				total = total + gridCP[x][y]
-		my_canvas.delete('all')
 		for x in range(c):
 			for y in range(r):
 				gridCP[x][y] = gridCP[x][y]/total #normalizing
@@ -144,12 +101,6 @@ def createGrid(c, r, content, contentTruth):
 		probH = probArr[1]
 		probT = probArr[2]
 		prevDir = direction
-		#for x in range(c):
-			#for y in range(r):
-				#x1 = (x * 50 + 20)
-				#y1 = (y * 50 + 20)
-				#text = my_canvas.create_text(x1 + 25, y1 + 15, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
-		#draw(c, r, content, contentTruth, gridT, my_canvas)
 	print('done')
 	return truthArr
 	root.resizable(True, True)
@@ -374,7 +325,39 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	ansArr.append(ans)#<- answer for prediction equation
 	return ansArr
 
+def createGraph(probAvg):
+	#file1 = open('testcase0.txt', 'r')
+	count = 0
+
+	probability_list = []
+	num_list = []
+  
+	for i in range(100):
+    		count += 1
+  
+    		# Get next line from file
+    		#line = file1.readline()
+  
+    		# if line is empty
+    		# end of file is reached
+    		#if not line:
+        	#	break
+    
+    		#num = float(line)
+    		num_list.append(count)
+  
+		#file1.close()
+
+	plt.plot(num_list, probAvg)
+	plt.title('Error Graph')
+	plt.xlabel('Number of Readings')
+	plt.ylabel('Magnitude of Error')
+	plt.show()
+	return
+
 def main():
+	probSum = [0 for i in range(100)]
+	probAvg = [0 for i in range(100)]
 	for x in range(10):
 		for y in range(10):
 			testFile = open(f'testcase{x}.txt', "r")
@@ -382,7 +365,11 @@ def main():
 			col, row = content[1].split()
 			testFile2 = open(f'InfoFile{y}ForMap{x}.txt', "r")
 			contentTruth = testFile2.readlines()
-			truthArr = createGrid(int(col), int(row), content, contentTruth) #returns array?
-			#print(truthArr)
+			truthArr = createGrid(int(col), int(row), content, contentTruth)
+			for i in range(100):
+				probSum[i] = probSum[i] + truthArr[i]
+	for i in range(100):
+		probAvg[i] = probSum[i]/100
+	createGraph(probAvg)
 	#createProb(int(col), int(row), context, textnum)
 main();
