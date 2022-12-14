@@ -91,6 +91,12 @@ def createGrid(c, r, content, contentTruth):
 				if gridP[mostx][mosty] < gridCP[x][y]:
 					mostx = x
 					mosty = y
+				elif gridP[mostx][mosty] == gridCP[x][y]:
+					randomList = [0, 1] # 50% chance of changing coords
+					randomNum = random.choice(randomList)
+					if randomNum == 1:
+						mostx = x
+						mosty = y
 				gridP[x][y] = gridCP[x][y]
 		difx = abs((trux-1) - mostx) # -1 because trux and truy have (1,1) origin
 		dify = abs((truy-1) - mosty)
