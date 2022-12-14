@@ -147,7 +147,7 @@ def createGrid(c, r, content, inNum):
 				curx = oldx
 				cury = oldy
 			moveArr.append(moveChar)
-			f.write("(" + str(curx) + "," + str(cury) + ")\n")
+			f.write(str(curx) + " " + str(cury) + "\n")
 		
 			actualType = 'N'
 			otherTypes = ['H', 'T']
