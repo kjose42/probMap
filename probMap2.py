@@ -240,10 +240,8 @@ def createGrid(c, r, content, inNum):
 	for x in range(c):
 		for y in range(r):
 			x1 = (x * 50 + 20)
-			x2 = (x1 + 10)
 			y1 = (y * 50 + 20)
-			y2 = (y1 + 10)
-			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
+			text = my_canvas.create_text(x1 + 25, y1 + 15, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
 	root.resizable(True, True)
 	root.mainloop()
 
