@@ -228,7 +228,7 @@ def createGrid(c, r, content, inNum):
 	print(textNum)
 	testFile = open(f'InfoFile{textNum}ForMap{inNum}.txt', "r")
 	content = testFile.readlines()
-	for i in range(4):
+	for i in range(3):
 		direction = content[3+10+i].rstrip()
 		print(direction)
 		blockType = content[4+10+10+i].rstrip()
@@ -241,14 +241,17 @@ def createGrid(c, r, content, inNum):
 		if blockType == 'T':
 			typeProb = probT
 		total = 0
+		#print("*********" + prevDir)
+		#print("********"+ direction)
 		for x in range(c):
 			for y in range(r):
 				#use prediction formula when moving in the same direction as last step
 				if prevDir == direction:
+					#print('here')
 					ansArr = predictCalc(x, y, r, c, direction, blockType, typeProb, gridF1[x][y], gridF2[x][y], gridT, gridP)
 					gridF1[x][y] = ansArr[0]
 					gridF2[x][y] = ansArr[1]
-					gridCP[x][y] = ansArr[0]
+					gridCP[x][y] = ansArr[2]
 				else:	
 					ansArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
 					gridCP[x][y] = ansArr[0]
@@ -256,11 +259,13 @@ def createGrid(c, r, content, inNum):
 					gridF2[x][y] = ansArr[1]
 				total = total + gridCP[x][y]
 		#normalizing
+		#for x in range(c):
+			#for y in range(r):
+				#gridCP[x][y] = gridCP[x][y]/total
 		for x in range(c):
 			for y in range(r):
-				gridCP[x][y] = gridCP[x][y]/total
-		gridP = gridCP
-		#update type probabilities with values from the new probability map	
+				gridP[x][y] = gridCP[x][y]
+		#update type probabilities with values from the new probability map
 		probArr = resetTypeProb(c, r, gridT, gridP)
 		probN = probArr[0]
 		probH = probArr[1]
@@ -279,7 +284,7 @@ def createGrid(c, r, content, inNum):
 	root.resizable(True, True)
 	root.mainloop()
 
-#update type probabilities with values from the new probability map	
+#update type probabilities with values from the new probability map
 def resetTypeProb(c, r, gridT, gridP):
 	probArr = []
 	probN = 0
@@ -396,7 +401,6 @@ def filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 	ansCalc2 = a*calc2
 	ansArr.append(ansCalc1)#<- filtering equation answer = P(X = C|E = T)
 	ansArr.append(ansCalc2)#<- filtering for P(X != C|E = T)
-	
 	return ansArr
 
 def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gridT, gridP):
@@ -464,6 +468,13 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	calc2 = .9*(prevProb)
 	ans = calc1*filter1 + calc2*filter2
 	filterArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
+	print('hey' + str(x) + ',' + str(y))
+	print('here' + str(prevx) + ',' + str(prevy))
+	print(calc1)
+	print(filter1)
+	print(calc2)
+	print(filter2)
+	print(ans)
 	ansArr.append(filterArr[0])
 	ansArr.append(filterArr[1])
 	ansArr.append(ans)#<- answer for prediction equation
