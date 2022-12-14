@@ -1,4 +1,10 @@
-def createGrid(c, r, content, inNum):
+from tkinter import *
+from tkinter import ttk
+from math import sqrt
+from array import *
+import random
+
+def createGrid(c, r, content, contentTruth):
 	root = Tk()
 	root.title('Grid')
 	root.geometry("800x700")
@@ -109,98 +115,11 @@ def createGrid(c, r, content, inNum):
 	#labelling y axis
 	for y in range(0, r):
 		text = my_canvas.create_text(10, y * 50 + 50, text=y+1, tags="text")
-
-	# Create a list of block objects
-	blk_lst = []
-	for i in range(c):
-		for j in range(r):
-			temp_block = block([i+1, j+1], gridT[i][j])
-			blk_lst.append(temp_block)
-
-	for i in range(1):
-		f = open(f'InfoFile{i}ForMap{inNum}.txt', "x")
-		startx = random.randint(1, c)
-		starty = random.randint(1, r)
-		while blk_lst[startx*starty - 1].blocked == True: #change coords if starting block is blocked
-			startx = random.randint(1, c)
-			starty = random.randint(1, r)
-		f.write("(x0, y0) = (" + str(startx) + "," + str(starty) + ")\n")
-		f.write("(xi, yi):\n")
-		curx = startx
-		cury = starty
-		moveArr = []
-		sensorArr = []
-		for inc in range(100): #generating ground truth states
-			move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
-			moveChar = ' '
-			oldx = curx
-			oldy = cury
-			#updating coords
-			if move == 1:
-				moveChar = 'U'
-				if cury != 1:
-					cury = cury - 1
-			if move == 2:
-				moveChar = 'L'
-				if curx != 1:
-					curx = curx - 1
-			if move == 3:
-				moveChar = 'D'
-				if cury != r:
-					cury = cury + 1
-			if move == 4:
-				moveChar = 'R'
-				if curx != c:
-					curx = curx + 1
-			moveFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
-			movef = random.choice(moveFail)
-			if gridT[curx - 1][cury - 1] == 'B' or movef == 1: #checking if its trying to move to a blocked block
-				curx = oldx
-				cury = oldy
-			moveArr.append(moveChar)
-			f.write("(" + str(curx) + "," + str(cury) + ")\n")
-		
-			actualType = 'N'
-			otherTypes = ['H', 'T']
-			if gridT[curx - 1][cury - 1] == 'H':
-				actualType = 'H'
-				otherTypes = ['N', 'T']
-			if gridT[curx - 1][cury - 1] == 'T':
-				actualType = 'T'
-				otherTypes = ['N', 'H']
-			senseFail1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] #5% chance of failing and sensing other type
-			senseFail2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] 
-			senseF1 = random.choice(senseFail1)
-			senseF2 = random.choice(senseFail2)
-			if senseF1 == 1:
-				sensorArr.append(otherTypes[0])
-			elif senseF2 == 1:
-				sensorArr.append(otherTypes[1])
-			else:
-				sensorArr.append(actualType)
-					
-		
-
-		#generating actions
-		f.write("a:\n")
-		for inc in range(100):
-			f.write(moveArr[inc] + "\n")
-
-		#generating sensor readings
-		f.write("e:\n")
-		for inc in range(100):
-			f.write(sensorArr[inc] + "\n")
-
-		f.close()
-
-	textNum = input('Enter the number of the ground truth file that you want to run: ')
-	print(textNum)
-	testFile = open(f'InfoFile{textNum}ForMap{inNum}.txt', "r")
-	content = testFile.readlines()
-	for i in range(3):
-		direction = content[3+100+i].rstrip()
+	
+	for i in range(100):
+		direction = contentTruth[3+100+i].rstrip()
 		#print(direction)
-		blockType = content[4+100+100+i].rstrip()
+		blockType = contentTruth[4+100+100+i].rstrip()
 		#print(blockType)
 		typeProb = 0	
 		if blockType == 'N':
@@ -435,10 +354,13 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	return ansArr
 
 def main():
-	textnum = input('Enter the number of the testcase that you want to run: ')
-	testFile = open(f'testcase{textnum}.txt', "r")
+	textNum = input('Enter the number of the testcase that you want to run: ')
+	testFile = open(f'testcase{textNum}.txt', "r")
 	content = testFile.readlines()
 	col, row = content[1].split()
-	createGrid(int(col), int(row), content, textnum)
+	textNum2 = input('Enter the number of the ground truth file that you want to run: ')
+	testFile2 = open(f'InfoFile{textNum2}ForMap{textNum}.txt', "r")
+	contentTruth = testFile2.readlines()
+	createGrid(int(col), int(row), content, contentTruth)
 	#createProb(int(col), int(row), context, textnum)
 main();
