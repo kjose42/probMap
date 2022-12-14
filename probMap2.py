@@ -1,30 +1,3 @@
-from tkinter import *
-from tkinter import ttk
-from math import sqrt
-from array import *
-import random
-
-class block:
-	def __init__(self, position, blockType):
-		if blockType == 'B':
-			self.blocked = True
-		else:
-			self.blocked = False
-		if blockType == 'H':
-			self.highway = True
-		else:
-			self.highway = False
-		if blockType == 'T':
-			self.traverse = True
-		else:
-			self.traverse = False
-		if blockType == 'N':
-			self.normal = True
-		else:
-			self.normal = False
-		self.x = position[0]
-		self.y = position[1]
-
 def createGrid(c, r, content, inNum):
 	root = Tk()
 	root.title('Grid')
@@ -64,11 +37,14 @@ def createGrid(c, r, content, inNum):
 	#Drawing the Grid (sqaures, vertices, start)
 	gridT = [] #grid indicating square type
 	gridP = [] #grid that shows each square's probability at previous iteration
-	gridCP = [[0]*r for i in range(c)] #grid that shows each square's probability at current iteration
+	gridCP = [[0]*r for i in range(c)] #grid that shows each square's probability at current iteration = P(X = C|E = T)
+	gridF1 = [[0]*r for i in range(c)] #grid that shows P(X = C|E = T) filtering
+	gridF2 = [[0]*r for i in range(c)] #grid that shows P(X != C|E = T) filtering
 	probN = 0 #probability of agent in normal block
 	probH = 0 #probability of agent in highway block
 	probT = 0 #probability of agent in "hard to traverse"
 	blockedCount = 0 #total num of blocked blocks
+	prevDir = ' ' #direction of previous step
 
 	#i represents the current grid square, used to check square's boolean var
 	i = 2
@@ -154,7 +130,7 @@ def createGrid(c, r, content, inNum):
 		cury = starty
 		moveArr = []
 		sensorArr = []
-		for inc in range(10): #generating ground truth states
+		for inc in range(100): #generating ground truth states
 			move = random.randint(1, 4) #1 = U, 2 = L, 3 = D, 4 = R
 			moveChar = ' '
 			oldx = curx
@@ -178,14 +154,10 @@ def createGrid(c, r, content, inNum):
 					curx = curx + 1
 			moveFail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] # 10% chance of move failing
 			movef = random.choice(moveFail)
-			#if movef == 1:
-				#print("fail")
 			if gridT[curx - 1][cury - 1] == 'B' or movef == 1: #checking if its trying to move to a blocked block
-				#print("blocked")
 				curx = oldx
 				cury = oldy
 			moveArr.append(moveChar)
-			#print("*" + str(curx) + " " + str(cury) + "*")
 			f.write("(" + str(curx) + "," + str(cury) + ")\n")
 		
 			actualType = 'N'
@@ -196,16 +168,13 @@ def createGrid(c, r, content, inNum):
 			if gridT[curx - 1][cury - 1] == 'T':
 				actualType = 'T'
 				otherTypes = ['N', 'H']
-			print(actualType)
 			senseFail1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] #5% chance of failing and sensing other type
 			senseFail2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] 
 			senseF1 = random.choice(senseFail1)
 			senseF2 = random.choice(senseFail2)
 			if senseF1 == 1:
-				print("fail1" + otherTypes[0])
 				sensorArr.append(otherTypes[0])
 			elif senseF2 == 1:
-				print("fail2" + otherTypes[1])
 				sensorArr.append(otherTypes[1])
 			else:
 				sensorArr.append(actualType)
@@ -214,25 +183,25 @@ def createGrid(c, r, content, inNum):
 
 		#generating actions
 		f.write("a:\n")
-		for inc in range(10):
+		for inc in range(100):
 			f.write(moveArr[inc] + "\n")
 
 		#generating sensor readings
 		f.write("e:\n")
-		for inc in range(10):
+		for inc in range(100):
 			f.write(sensorArr[inc] + "\n")
 
 		f.close()
-		
+
 	textNum = input('Enter the number of the ground truth file that you want to run: ')
 	print(textNum)
 	testFile = open(f'InfoFile{textNum}ForMap{inNum}.txt', "r")
 	content = testFile.readlines()
 	for i in range(3):
-		direction = content[3+10+i].rstrip()
-		print(direction)
-		blockType = content[4+10+10+i].rstrip()
-		print(blockType)
+		direction = content[3+100+i].rstrip()
+		#print(direction)
+		blockType = content[4+100+100+i].rstrip()
+		#print(blockType)
 		typeProb = 0	
 		if blockType == 'N':
 			typeProb = probN
@@ -241,13 +210,10 @@ def createGrid(c, r, content, inNum):
 		if blockType == 'T':
 			typeProb = probT
 		total = 0
-		#print("*********" + prevDir)
-		#print("********"+ direction)
 		for x in range(c):
 			for y in range(r):
 				#use prediction formula when moving in the same direction as last step
 				if prevDir == direction:
-					#print('here')
 					ansArr = predictCalc(x, y, r, c, direction, blockType, typeProb, gridF1[x][y], gridF2[x][y], gridT, gridP)
 					gridF1[x][y] = ansArr[0]
 					gridF2[x][y] = ansArr[1]
@@ -259,9 +225,9 @@ def createGrid(c, r, content, inNum):
 					gridF2[x][y] = ansArr[1]
 				total = total + gridCP[x][y]
 		#normalizing
-		#for x in range(c):
-			#for y in range(r):
-				#gridCP[x][y] = gridCP[x][y]/total
+		for x in range(c):
+			for y in range(r):
+				gridCP[x][y] = gridCP[x][y]/total
 		for x in range(c):
 			for y in range(r):
 				gridP[x][y] = gridCP[x][y]
@@ -270,9 +236,6 @@ def createGrid(c, r, content, inNum):
 		probN = probArr[0]
 		probH = probArr[1]
 		probT = probArr[2]
-		print(probN)
-		print(probH)
-		print(probT)
 		prevDir = direction
 	for x in range(c):
 		for y in range(r):
@@ -468,13 +431,6 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	calc2 = .9*(prevProb)
 	ans = calc1*filter1 + calc2*filter2
 	filterArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
-	print('hey' + str(x) + ',' + str(y))
-	print('here' + str(prevx) + ',' + str(prevy))
-	print(calc1)
-	print(filter1)
-	print(calc2)
-	print(filter2)
-	print(ans)
 	ansArr.append(filterArr[0])
 	ansArr.append(filterArr[1])
 	ansArr.append(ans)#<- answer for prediction equation
@@ -486,4 +442,5 @@ def main():
 	content = testFile.readlines()
 	col, row = content[1].split()
 	createGrid(int(col), int(row), content, textnum)
+	#createProb(int(col), int(row), context, textnum)
 main();
