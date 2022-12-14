@@ -378,5 +378,4 @@ def main():
 	testFile2 = open(f'InfoFile{textNum2}ForMap{textNum}.txt', "r")
 	contentTruth = testFile2.readlines()
 	createGrid(int(col), int(row), content, contentTruth)
-	#createProb(int(col), int(row), context, textnum)
 main();
