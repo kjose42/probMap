@@ -241,10 +241,9 @@ def createGrid(c, r, content, inNum):
 		if blockType == 'T':
 			typeProb = probT
 		total = 0
-		if prevDir == direction:
-			print('hey')
 		for x in range(c):
 			for y in range(r):
+				#use prediction formula when moving in the same direction as last step
 				if prevDir == direction:
 					ansArr = predictCalc(x, y, r, c, direction, blockType, typeProb, gridF1[x][y], gridF2[x][y], gridT, gridP)
 					gridF1[x][y] = ansArr[0]
@@ -256,11 +255,12 @@ def createGrid(c, r, content, inNum):
 					gridF1[x][y] = ansArr[0]
 					gridF2[x][y] = ansArr[1]
 				total = total + gridCP[x][y]
-		
+		#normalizing
 		for x in range(c):
 			for y in range(r):
 				gridCP[x][y] = gridCP[x][y]/total
 		gridP = gridCP
+		#update type probabilities with values from the new probability map	
 		probArr = resetTypeProb(c, r, gridT, gridP)
 		probN = probArr[0]
 		probH = probArr[1]
@@ -276,10 +276,10 @@ def createGrid(c, r, content, inNum):
 			y1 = (y * 50 + 20)
 			y2 = (y1 + 10)
 			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
-	print(gridF2[19][9])
 	root.resizable(True, True)
 	root.mainloop()
 
+#update type probabilities with values from the new probability map	
 def resetTypeProb(c, r, gridT, gridP):
 	probArr = []
 	probN = 0
@@ -394,8 +394,8 @@ def filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 	a = 1/(calc1 + calc2)
 	ansCalc1 = a*calc1 
 	ansCalc2 = a*calc2
-	ansArr.append(ansCalc1)
-	ansArr.append(ansCalc2)
+	ansArr.append(ansCalc1)#<- filtering equation answer = P(X = C|E = T)
+	ansArr.append(ansCalc2)#<- filtering for P(X != C|E = T)
 	
 	return ansArr
 
@@ -466,7 +466,7 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	filterArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
 	ansArr.append(filterArr[0])
 	ansArr.append(filterArr[1])
-	ansArr.append(ans)
+	ansArr.append(ans)#<- answer for prediction equation
 	return ansArr
 
 def main():
