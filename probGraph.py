@@ -6,7 +6,6 @@ import random
 import matplotlib.pyplot as plt
 
 def createGrid(c, r, content, contentTruth):
-	errorArr = [] #stores error values
 	truthArr = [] #stores agent's true position probability
 	gridT = [] #grid indicating square type
 	gridP = [] #grid that shows each square's probability at previous iteration
@@ -55,16 +54,12 @@ def createGrid(c, r, content, contentTruth):
 		gridP.append(tmp_arrP)
 	skip = 0
 	for i in range(100):
-		#mostCoords = [0 for i in range(2)]
-		#print(gridP[mostCoords[0]][mostCoords[1]])
 		#(trux, truy) represent the agent's true coordinates
 		trux, truy = contentTruth[2+i].split()
 		trux = int(trux)
 		truy = int(truy)
 		direction = contentTruth[3+100+i].rstrip()
-		#print(direction)
 		blockType = contentTruth[4+100+100+i].rstrip()
-		#print(blockType)
 		typeProb = 0	
 		if blockType == 'N':
 			typeProb = probN
@@ -90,9 +85,6 @@ def createGrid(c, r, content, contentTruth):
 		for x in range(c):
 			for y in range(r):
 				gridCP[x][y] = gridCP[x][y]/total #normalizing
-				#if gridP[mostCoords[0]][mostCoords[1]] < gridCP[x][y]:
-				#	mostCoords[0] = x
-				#	mostCoords[1] = y
 				gridP[x][y] = gridCP[x][y]
 		truthArr.append(gridP[trux-1][truy-1])# - 1 because trux and truy start with 1
 		#update type probabilities with values from the new probability map
@@ -101,7 +93,6 @@ def createGrid(c, r, content, contentTruth):
 		probH = probArr[1]
 		probT = probArr[2]
 		prevDir = direction
-	print('done')
 	return truthArr
 	root.resizable(True, True)
 	root.mainloop()
@@ -326,7 +317,6 @@ def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gr
 	return ansArr
 
 def createGraph(probAvg):
-	#file1 = open('testcase0.txt', 'r')
 	count = 0
 
 	probability_list = []
@@ -334,30 +324,16 @@ def createGraph(probAvg):
   
 	for i in range(100):
     		count += 1
-  
-    		# Get next line from file
-    		#line = file1.readline()
-  
-    		# if line is empty
-    		# end of file is reached
-    		#if not line:
-        	#	break
-    
-    		#num = float(line)
     		num_list.append(count)
-  
-		#file1.close()
-
 	plt.plot(num_list, probAvg)
-	plt.title('Error Graph')
+	plt.title('Actual Location Probability Graph')
 	plt.xlabel('Number of Readings')
-	plt.ylabel('Magnitude of Error')
+	plt.ylabel('Filtering\'s Probability of Agent\'s Actual Location')
 	plt.show()
-	return
 
 def main():
-	probSum = [0 for i in range(100)]
-	probAvg = [0 for i in range(100)]
+	probSum = [0 for i in range(100)] #sum of probabilities at step i over 100 experiments
+	probAvg = [0 for i in range(100)] #avg of probabilities at "                         "
 	for x in range(10):
 		for y in range(10):
 			testFile = open(f'testcase{x}.txt', "r")
@@ -367,9 +343,8 @@ def main():
 			contentTruth = testFile2.readlines()
 			truthArr = createGrid(int(col), int(row), content, contentTruth)
 			for i in range(100):
-				probSum[i] = probSum[i] + truthArr[i]
+				probSum[i] = probSum[i] + truthArr[i]		
 	for i in range(100):
 		probAvg[i] = probSum[i]/100
 	createGraph(probAvg)
-	#createProb(int(col), int(row), context, textnum)
 main();
