@@ -223,66 +223,87 @@ def createGrid(c, r, content, inNum):
 			f.write(sensorArr[inc] + "\n")
 
 		f.close()
-
-	#textnum = input('Enter the number of the ground truth file that you want to run: ')
-	#print(textnum)
-	#finding probability when direction is R and blocktype is N
-	direction = 'R'
-	blockType = 'N'
-	typeProb = probN 
-	total = 0
+		
+	textNum = input('Enter the number of the ground truth file that you want to run: ')
+	print(textNum)
+	testFile = open(f'InfoFile{textNum}ForMap{inNum}.txt', "r")
+	content = testFile.readlines()
+	for i in range(4):
+		direction = content[3+10+i].rstrip()
+		print(direction)
+		blockType = content[4+10+10+i].rstrip()
+		print(blockType)
+		typeProb = 0	
+		if blockType == 'N':
+			typeProb = probN
+		if blockType == 'H':
+			typeProb = probH
+		if blockType == 'T':
+			typeProb = probT
+		total = 0
+		if prevDir == direction:
+			print('hey')
+		for x in range(c):
+			for y in range(r):
+				if prevDir == direction:
+					ansArr = predictCalc(x, y, r, c, direction, blockType, typeProb, gridF1[x][y], gridF2[x][y], gridT, gridP)
+					gridF1[x][y] = ansArr[0]
+					gridF2[x][y] = ansArr[1]
+					gridCP[x][y] = ansArr[0]
+				else:	
+					ansArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
+					gridCP[x][y] = ansArr[0]
+					gridF1[x][y] = ansArr[0]
+					gridF2[x][y] = ansArr[1]
+				total = total + gridCP[x][y]
+		
+		for x in range(c):
+			for y in range(r):
+				gridCP[x][y] = gridCP[x][y]/total
+		gridP = gridCP
+		probArr = resetTypeProb(c, r, gridT, gridP)
+		probN = probArr[0]
+		probH = probArr[1]
+		probT = probArr[2]
+		print(probN)
+		print(probH)
+		print(probT)
+		prevDir = direction
 	for x in range(c):
 		for y in range(r):
 			x1 = (x * 50 + 20)
 			x2 = (x1 + 10)
 			y1 = (y * 50 + 20)
 			y2 = (y1 + 10)
-			gridCP[x][y] = calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP)#changed
-			#text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
-			total = total + gridCP[x][y]
-	gridP = gridCP
-	probArr = resetTypeProb(c, r, gridT, gridP)
-	probN = probArr[0]
-	probH = probArr[1]
-	probT = probArr[2]
-	print(probN)
-	print(probH)
-	print(probT)
-	direction = 'D'
-	blockType = 'H'
-	typeProb = probH
-	total = 0
-	for x in range(c):
-		for y in range(r):
-			x1 = (x * 50 + 20)
-			x2 = (x1 + 10)
-			y1 = (y * 50 + 20)
-			y2 = (y1 + 10)
-			gridCP[x][y] = calcProb(x, y, r, c, direction, blockType, typeProb, gridT, gridP)#changed
-			total = total + gridCP[x][y]
-			#text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
-	for x in range(c):
-		for y in range(r):
-			x1 = (x * 50 + 20)
-			x2 = (x1 + 10)
-			y1 = (y * 50 + 20)
-			y2 = (y1 + 10)
-			gridCP[x][y] = gridCP[x][y]/total
-			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridCP[x][y], 3), tags="text")
-	gridP = gridCP
-	probArr = resetTypeProb(c, r, gridT, gridP)
-	probN = probArr[0]
-	probH = probArr[1]
-	probT = probArr[2]
-	print(probN)
-	print(probH)
-	print(probT)
+			text = my_canvas.create_text(x1 + 20, y1 + 12, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
+	print(gridF2[19][9])
 	root.resizable(True, True)
 	root.mainloop()
 
-def filteringCalc(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
+def resetTypeProb(c, r, gridT, gridP):
+	probArr = []
+	probN = 0
+	probH = 0
+	probT = 0
+	for x in range(c):
+		for y in range(r):
+			if gridT[x][y] == 'N':
+				probN = probN + gridP[x][y]
+			if gridT[x][y] == 'H':
+				probH = probH + gridP[x][y]
+			if gridT[x][y] == 'T':
+				probT = probT + gridP[x][y]
+	probArr.append(probN)
+	probArr.append(probH)
+	probArr.append(probT)
+	return probArr
+
+def filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
+	ansArr = []
 	if gridT[x][y] == 'B':
-		return 0.00
+		ansArr.append(0.0)
+		ansArr.append(0.0)
+		return ansArr
 	#{prevx, prevy} represents agent coords before moving into {x,y}
 	#prevx or prevy will stay as -1 if out of bounds
 	prevx = -1
@@ -354,11 +375,10 @@ def filteringCalc(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 		
 	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X != C)
 	#typeProb = chance of agent in right block type
-	
 	if gridT[x][y] == blockType:
-		calc2 = .9*(typeProb-gridP[x][y]) + .1*(1-typeProb)
+		calc2 = .9*(typeProb-gridP[x][y]) + .05*(1-typeProb)
 	else:
-		calc2 = .9*typeProb + .1*(1-typeProb-gridP[x][y])
+		calc2 = .9*typeProb + .05*(1-typeProb-gridP[x][y])
 	#given agent is not at {x,y}, chance of reading is correct = P(E = T|X != C)
 
 	#nextProb represents (X1 != C|X0 = C)
@@ -372,8 +392,82 @@ def filteringCalc(x, y, r, c, direction, blockType, typeProb, gridT, gridP):
 	calc2 = calc2*(.9*nextProb*gridP[x][y] + (moveProb + stayProb)*(1-gridP[x][y]))
 	#isolating 'a' variable
 	a = 1/(calc1 + calc2)
-	ans = a*calc1
-	return ans
+	ansCalc1 = a*calc1 
+	ansCalc2 = a*calc2
+	ansArr.append(ansCalc1)
+	ansArr.append(ansCalc2)
+	
+	return ansArr
+
+def predictCalc(x, y, r, c, direction, blockType, typeProb, filter1, filter2, gridT, gridP):
+	ansArr = []
+	if gridT[x][y] == 'B':
+		ansArr.append(0.0)
+		ansArr.append(0.0)
+		ansArr.append(0.0)
+		return ansArr
+	#{prevx, prevy} represents agent coords before moving into {x,y}
+	#prevx or prevy will stay as -1 if out of bounds
+	prevx = -1
+	prevy = -1
+	if direction == 'U':
+		prevx = x
+		if y != r-1:
+			prevy = y + 1
+	if direction == 'L':
+		prevy = y
+		if x != c-1:
+			prevx = x + 1
+	if direction == 'D':
+		prevx = x
+		if y != 0:
+			prevy = y - 1
+	if direction == 'R':
+		prevy = y
+		if x != 0:
+			prevx = x - 1
+	#{nextx, nexty} represents agent coords after moving from {x,y}
+	#nextx or nexty will stay as -1 if out of bounds
+	nextx = -1
+	nexty = -1
+	if direction == 'U':
+		nextx = x
+		if y != 0:
+			nexty = y - 1
+	if direction == 'L':
+		nexty = y
+		if x != 0:
+			nextx = x - 1
+	if direction == 'D':
+		nextx = x
+		if y != r-1:
+			nexty = y + 1
+	if direction == 'R':
+		nexty = y
+		if x != c-1:
+			nextx = x + 1
+	prevProb = 0
+	#calc1 = probability of agent starting at {x,y} and staying there
+	calc1 = 0
+	#calc2 = probability of agent not starting at {x,y} and moving to {x,y}
+	calc2 = 0
+	if prevx != -1 and prevy != -1: 
+		prevProb = gridP[prevx][prevy]
+	if nextx != -1 and nexty != -1:
+		if gridT[nextx][nexty] == 'B':
+			calc1 = 1
+		else:
+			#if movement isnt blocked, .1 chance to stay
+			calc1 = .1
+	else:
+		calc1 = 1
+	calc2 = .9*(prevProb)
+	ans = calc1*filter1 + calc2*filter2
+	filterArr = filterCal(x, y, r, c, direction, blockType, typeProb, gridT, gridP)
+	ansArr.append(filterArr[0])
+	ansArr.append(filterArr[1])
+	ansArr.append(ans)
+	return ansArr
 
 def main():
 	textnum = input('Enter the number of the testcase that you want to run: ')
