@@ -52,25 +52,7 @@ def createGrid(c, r, content, contentTruth):
 	blockedCount = 0 #total num of blocked blocks
 	prevDir = ' ' #direction of previous step
 
-	#i represents the current grid square, used to check square's boolean var
-	i = 2
-	for x in range(0, c):
-		for y in range(0, r):
-			cx, cy, b, h, t = content[i].split()
-			x1 = ((int(cx)-1) * 50 + 25)
-			y1 = ((int(cy)-1) * 50 + 25)
-			x2 = (y1 + 50)
-			y2 = (x1 + 50)
-			b = b.strip()
-			my_canvas.create_rectangle(x1,y1,y2,x2)
-			if b == '1': #square is blocked
-				my_canvas.create_rectangle(x1,y1,y2,x2,fill='gray')
-			if h == '1': #square is highway
-				my_canvas.create_rectangle(x1,y1,y2,x2,fill='yellow')
-			if t == '1': #square is "hard to traverse"
-				my_canvas.create_rectangle(x1,y1,y2,x2,fill='purple')
-			i = i + 1
-			my_canvas.create_rectangle(x1,y1,y2,x2)
+	draw(c, r, content, contentTruth, gridT, my_canvas)
 	
 	#counting blocked squares
 	i = 2
@@ -106,17 +88,8 @@ def createGrid(c, r, content, contentTruth):
 			i = i + 1
 		gridT.append(tmp_arrT)
 		gridP.append(tmp_arrP)
-	
-	#labelling x axis
-	for x in range(0, c):
-		text = my_canvas.create_text(x * 50 + 50, 10, text=x+1, tags="text")
-		# my_canvas.update()
-
-	#labelling y axis
-	for y in range(0, r):
-		text = my_canvas.create_text(10, y * 50 + 50, text=y+1, tags="text")
-	
-	for i in range(100):
+	skip = 0
+	for i in range(100): 
 		direction = contentTruth[3+100+i].rstrip()
 		#print(direction)
 		blockType = contentTruth[4+100+100+i].rstrip()
@@ -143,12 +116,9 @@ def createGrid(c, r, content, contentTruth):
 					gridF1[x][y] = ansArr[0]
 					gridF2[x][y] = ansArr[1]
 				total = total + gridCP[x][y]
-		#normalizing
 		for x in range(c):
 			for y in range(r):
-				gridCP[x][y] = gridCP[x][y]/total
-		for x in range(c):
-			for y in range(r):
+				gridCP[x][y] = gridCP[x][y]/total #normalizing
 				gridP[x][y] = gridCP[x][y]
 		#update type probabilities with values from the new probability map
 		probArr = resetTypeProb(c, r, gridT, gridP)
@@ -156,13 +126,51 @@ def createGrid(c, r, content, contentTruth):
 		probH = probArr[1]
 		probT = probArr[2]
 		prevDir = direction
-	for x in range(c):
-		for y in range(r):
-			x1 = (x * 50 + 20)
-			y1 = (y * 50 + 20)
-			text = my_canvas.create_text(x1 + 25, y1 + 15, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
+		for x in range(c):
+			for y in range(r):
+				x1 = (x * 50 + 20)
+				y1 = (y * 50 + 20)
+				text = my_canvas.create_text(x1 + 25, y1 + 15, font=("Helvetica", 10), text=round(gridP[x][y], 3), tags="text")
+		if i != 99:
+			if skip == 0:
+				inNum = input('Enter the number of steps you want to proceed with')
+				skip = int(inNum) - 1
+			else:#still need to skip more steps
+				skip = skip - 1
+			my_canvas.delete('all')
+			draw(c, r, content, contentTruth, gridT, my_canvas)
 	root.resizable(True, True)
 	root.mainloop()
+
+def draw(c, r, content, contentTruth, gridT, my_canvas):
+	#i represents the current grid square, used to check square's boolean var
+	i = 2
+	for x in range(0, c):
+		for y in range(0, r):
+			cx, cy, b, h, t = content[i].split()
+			x1 = ((int(cx)-1) * 50 + 25)
+			y1 = ((int(cy)-1) * 50 + 25)
+			x2 = (y1 + 50)
+			y2 = (x1 + 50)
+			b = b.strip()
+			my_canvas.create_rectangle(x1,y1,y2,x2)
+			if b == '1': #square is blocked
+				my_canvas.create_rectangle(x1,y1,y2,x2,fill='gray')
+			if h == '1': #square is highway
+				my_canvas.create_rectangle(x1,y1,y2,x2,fill='yellow')
+			if t == '1': #square is "hard to traverse"
+				my_canvas.create_rectangle(x1,y1,y2,x2,fill='purple')
+			i = i + 1
+			my_canvas.create_rectangle(x1,y1,y2,x2)
+	
+	#labelling x axis
+	for x in range(0, c):
+		text = my_canvas.create_text(x * 50 + 50, 10, text=x+1, tags="text")
+		# my_canvas.update()
+
+	#labelling y axis
+	for y in range(0, r):
+		text = my_canvas.create_text(10, y * 50 + 50, text=y+1, tags="text")
 
 #update type probabilities with values from the new probability map
 def resetTypeProb(c, r, gridT, gridP):
