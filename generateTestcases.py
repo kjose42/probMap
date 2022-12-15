@@ -6,7 +6,7 @@ def createTest(n):
 
 	#randanly select a grid size
 	row = 50	
-	col = 100	
+	col = 50	
 
 	# create file
 	f = open(f'testcase{n}.txt', "x")
