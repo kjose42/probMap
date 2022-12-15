@@ -14,5 +14,3 @@ For part B, we ran probMap to calculate the probabilities of the agent being in 
 To generate a graph of the average error (between the agent's actual location and the filtering's estimation) for each step, we ran errGraph. The user inputs a map file and a ground truth file.
 
 To generate a graph of the average probability (of the cell that the agent is actually in) for each step, we ran probGraph. The user inputs a map file and a ground truth file.
-
-(info and maps folders are for Question 5 part B)
